@@ -1,24 +1,26 @@
 firebase.auth().onAuthStateChanged(function (firebaseUser) {
 
-    if(firebaseUser){
+    console.log("here");
+    // if(firebaseUser){
+        
 
+    // }else
+    // {
+    //     if(window.location!="http://kingapp.com.br/html/login.html"){
+    //         console.log("if");
+    //         window.location="http://dev.resapp.com/"
+    //     }
+    //     else {
+    //         console.log("else");
+    //     }
 
-    }else
-    {
-        if(window.location!="http://kingapp.com.br/html/login.html"){
-            window.location="http://kingapp.com.br/html/login.html"
-        }
-        else {
-
-        }
-
-    }
+    // }
 });
 
 
 function logOut(){
     firebase.auth().signOut();
-    window.location = "http://kingapp.com.br/html/login.html";
+    window.location = "http://dev.resapp.com/";
 
 }
 
@@ -79,10 +81,8 @@ function login(){
 
     var auth=firebase.auth();
     firebase.auth().signInWithEmailAndPassword(email,password).then(function(result) {
-        window.location.href="http://kingapp.com.br/html/orders.html";
+        window.location.href="http://dev.resapp.com/orders.html";
     }, function(error) {
-              document.getElementById('err').style.display='block';
-
-
+        document.getElementById('err').style.display='block';
     });
 }

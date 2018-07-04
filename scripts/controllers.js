@@ -1,17 +1,10 @@
 /**
  * Created by Shahrukh on 3/6/2018.
  */
-    /*
-var config = {
-    apiKey: "AIzaSyB7VBkAuGDMtdlenkpf7YGmNCrtv4wgLPU",
-    authDomain: "pizzaandroidapp.firebaseapp.com",
-    databaseURL: "https://pizzaandroidapp.firebaseio.com",
-    projectId: "pizzaandroidapp",
-    storageBucket: "pizzaandroidapp.appspot.com",
-    messagingSenderId: "456330711525"
-};
-firebase.initializeApp(config);
-*/
+/**
+ * Created by Mohd on 04.07.2018
+ * 
+ */
 
 var totalUsers=0;
 var countUsers=0;
@@ -19,54 +12,35 @@ var lastOrderCount=0;
 var orders= new Array();
 
 var myApp=angular.module("pizza",["firebase"])
-    .controller("ordersController",function($scope,$firebaseArray)        {
-
-
+    .controller("ordersController",function($scope,$firebaseArray) {
 
         var ref=firebase.database().ref().child('ORDERS');
+            console.log(ref);
             ref.on('value',function(snap){
+
                 var obj=document.getElementById('ordersBody');
-                obj.innerHTML ="";
-                totalUsers=snap.numChildren();
+                    obj.innerHTML ="";
+                    totalUsers=snap.numChildren();
 
-                angular.forEach(snap.val(), function(value, key) {
+                    angular.forEach(snap.val(), function(value, key) {
 
-
-                    var userKey=key;
-                    this.user='';
-                    var userRef=firebase.database().ref('USERS').child(userKey);
-                    userRef.on('value',function(userSnap){
-                        countUsers++;
-
-                        this.user=userSnap.val();
-                        var uKey= userSnap.key;
-
-                        populateUi(value,this.user,obj,uKey,"Pending");
-
+                        var userKey=key;
+                        this.user='';
+                        var userRef=firebase.database().ref('USERS').child(userKey);
+                        userRef.on('value',function(userSnap){
+                            countUsers++;
+                            this.user=userSnap.val();
+                            var uKey= userSnap.key;
+                            populateUi(value,this.user,obj,uKey,"Pending");
+                        });
                     });
-
-
-                });
-
-
             });
-
-
-      ////////////////////
-
-      /////////
-
-
-
-    }).controller("usersController",function($scope,$firebaseArray)        {
-
-
+    }).controller("usersController",function($scope,$firebaseArray) {
 
         var ref=firebase.database().ref("USERS");
         $scope.users = $firebaseArray(ref);
 
-
-       $scope.displayProfile= function(user){
+        $scope.displayProfile= function(user){
             $("#profileModal").modal();
            document.getElementById('pName').innerHTML=user.name;
            document.getElementById('pEmail').innerHTML=user.email;
@@ -159,9 +133,7 @@ var myApp=angular.module("pizza",["firebase"])
 
 
 
-    }).controller("productsController",function($scope,$firebaseArray)        {
-
-
+    }).controller("productsController",function($scope,$firebaseArray){
 
         var ref=firebase.database().ref("PRODUCTS");
         $scope.products = $firebaseArray(ref);
@@ -169,102 +141,68 @@ var myApp=angular.module("pizza",["firebase"])
         $scope.delItem=$scope.products;
 
         $scope.deleteProduct= function(product){
-
-
-
             $scope.delItem=product;
-
             $("#deleteModal").modal();
         }
+
         $scope.confirmDelete=function(){
-
             firebase.database().ref('PRODUCTS').child($scope.delItem.$id).remove();
-
             $("#deleteSuccessModal").modal();
-
         }
 
         $scope.showProductModal= function(){
             document.getElementById('addProd').style.display='block';
             document.getElementById('successMessage').style.display='none';
-
             $("#addProductModal").modal();
-
-
         }
 
         $scope.addProduct= function(){
+
             var name=document.getElementById('name');
             var price=document.getElementById('price');
             var description=document.getElementById('description');
             var file= document.getElementById('pic').files[0];
 
-
             if(name.value==""||price.value==""||description.value==""){
-
                 document.getElementById('errorMsg').style.display='block';
-
             }
-            else{
+            else
+            {
                 var storageRef=firebase.storage().ref(''+(Math.floor(Date.now())));
                 var downloadUrl='';
                 storageRef.put(file).then(function(snapshot){
                     downloadUrl=snapshot.downloadURL;
                     insertProduct();
-
                 });
 
-
-
-
-
-
-              function insertProduct(){
-                  var ref=firebase.database().ref("PRODUCTS");
-                  $firebaseArray(ref).$add({ description: description.value, imageUrl: downloadUrl, name: name.value,price: price.value})
-                      .then(function (ref) {
-                      $.ajax({
-  url: "push.php",
-  type: "get", //send it through get method
-  data: { 
-    description: description.value, 
-    name: name.value
-    
-  },
-  success: function(response) {
-
-  
-  },
-  error: function(xhr) {
-    //Do Something to handle error
-  }
-});
-                          document.getElementById('productForm').reset();
-                          document.getElementById('addProd').style.display='none';
-                          document.getElementById('successMessage').style.display='block';
-                          
-                          
-
-                      },function(error){
-
-                          console.log(error);
-                      }
-
-
-                  )
-
-
-              }
-
-
-
-
-
-
+                function insertProduct(){
+                    var ref=firebase.database().ref("PRODUCTS");
+                    $firebaseArray(ref).$add({ description: description.value, imageUrl: downloadUrl, name: name.value,price: price.value})
+                        .then(function (ref) {
+                            $.ajax({
+                                url: "push.php",
+                                type: "get", //send it through get method
+                                data: { 
+                                    description: description.value, 
+                                    name: name.value
+                                },
+                                success: function(response) {
+                                    console.log("success", response);
+                                },
+                                error: function(xhr) {
+                                    console.log("failed",xhr);
+                                    //Do Something to handle error
+                                }
+                            });
+                            
+                            document.getElementById('productForm').reset();
+                            document.getElementById('addProd').style.display='none';
+                            document.getElementById('successMessage').style.display='block';
+                        },function(error){
+                            console.log(error);
+                        })
+                }
             }
-
-
-
         }
 
 
